@@ -1,0 +1,113 @@
+syntax = "proto3";
+package user;
+option go_package = "./proto";
+import "google/protobuf/timestamp.proto";
+message UserMessage {
+  int32 id = 1;
+  string username = 2;
+  string email = 3;
+  string password = 4;
+  string avatar = 5;
+}
+
+// Определяем сервис UserService
+service UserService {
+  // Метод для сброса пароля
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+
+  // Метод для верификации кода
+  rpc VerifyCode(VerifyCodeRequest) returns (VerifyCodeResponse);
+
+  // Метод для смены пароля
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+
+  // Метод для смены почты
+  rpc ChangeEmail(ChangeEmailRequest) returns (ChangeEmailResponse);
+
+  // Метод для смены аватара
+  rpc ChangeAvatar(ChangeAvatarRequest) returns (ChangeAvatarResponse);
+
+  // Метод для выхода из аккаунта
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+}
+
+// Определяем сообщения для входных и выходных данных
+
+// Сообщение для сброса пароля
+message ResetPasswordRequest {
+  string email = 1;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Сообщение для верификации кода
+message VerifyCodeRequest {
+  string email = 1;
+  string verification_code = 2;
+}
+
+message VerifyCodeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Сообщение для смены пароля
+message ChangePasswordRequest {
+  string email = 1;
+  string new_password = 2;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Сообщение для смены почты
+message ChangeEmailRequest {
+  string email = 1;
+  string new_email = 2;
+}
+
+message ChangeEmailResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Сообщение для смены аватара
+message ChangeAvatarRequest {
+  string email = 1;
+  bytes avatar_data = 2;
+}
+
+message ChangeAvatarResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Сообщение для выхода из аккаунта
+message LogoutRequest {
+  string email = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string phone = 4;
+  google.protobuf.Timestamp timezone = 5;
+
+}
+
+message RegisterResponse {
+  bool success = 1;
+  // Другие поля, если необходимо
+}
