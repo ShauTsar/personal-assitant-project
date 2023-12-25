@@ -19,7 +19,7 @@ type RedisConfig struct {
 func LoadDatabaseConfig() DatabaseConfig {
 	return DatabaseConfig{
 		Username: "postgres",
-		Password: "postgres",
+		Password: "NNA2s*123",
 		Host:     "localhost",
 		Port:     "15432",
 		Database: "novaDB",

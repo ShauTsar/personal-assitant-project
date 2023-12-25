@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"personal-assitant-project/config"
-	userpb "personal-assitant-project/personal-assitant-server/grpc/proto"
+	userpb "personal-assitant-project/personal-assitant-server/grpc/proto/gen"
 )
 
 func CheckUserExists(username string) (bool, error) {
@@ -20,6 +20,7 @@ func CheckUserExists(username string) (bool, error) {
 	}
 	return count > 0, nil
 }
+
 func SaveUserData(request *userpb.RegisterRequest) error {
 	db := LoadDBFromConfig()
 	query := `
@@ -30,6 +31,7 @@ func SaveUserData(request *userpb.RegisterRequest) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 func LoadDBFromConfig() *sql.DB {
@@ -45,4 +47,19 @@ func LoadDBFromConfig() *sql.DB {
 		panic(err)
 	}
 	return db
+}
+func CheckCredentials(username, password string) (bool, error) {
+	db := LoadDBFromConfig()
+	defer db.Close()
+
+	query := "SELECT COUNT(*) FROM users WHERE username = $1 AND password = $2"
+	var count int
+	if err := db.QueryRow(query, username, password).Scan(&count); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return count > 0, nil
 }
