@@ -4,7 +4,7 @@
 // - protoc             v4.24.4
 // source: user.proto
 
-package gen
+package proto
 
 import (
 	context "context"
@@ -30,6 +30,18 @@ type UserServiceClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	UpdateTelegramUserID(ctx context.Context, in *UpdateTelegramUserIDRequest, opts ...grpc.CallOption) (*UpdateTelegramUserIDResponse, error)
+	AddEventData(ctx context.Context, in *AddEventDataRequest, opts ...grpc.CallOption) (*AddEventDataResponse, error)
+	GetAllEvents(ctx context.Context, in *GetAllEventsRequest, opts ...grpc.CallOption) (*GetAllEventsResponse, error)
+	FinishEvent(ctx context.Context, in *FinishEventRequest, opts ...grpc.CallOption) (*FinishEventResponse, error)
+	UpdateUserSettings(ctx context.Context, in *UpdateUserSettingsRequest, opts ...grpc.CallOption) (*UpdateUserSettingsResponse, error)
+	GetUserSettings(ctx context.Context, in *UserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
+	GetFinances(ctx context.Context, in *GetFinancesRequest, opts ...grpc.CallOption) (*GetFinancesResponse, error)
+	GetCategories(ctx context.Context, in *GetCategoriesRequest, opts ...grpc.CallOption) (*GetCategoriesResponse, error)
+	AddFinance(ctx context.Context, in *AddFinanceRequest, opts ...grpc.CallOption) (*AddFinanceResponse, error)
+	DeleteFinance(ctx context.Context, in *DeleteFinanceRequest, opts ...grpc.CallOption) (*DeleteFinanceResponse, error)
+	AddCategory(ctx context.Context, in *AddCategoryRequest, opts ...grpc.CallOption) (*AddCategoryResponse, error)
+	ArchiveEvent(ctx context.Context, in *ArchiveEventRequest, opts ...grpc.CallOption) (*ArchiveEventResponse, error)
 }
 
 type userServiceClient struct {
@@ -112,6 +124,114 @@ func (c *userServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateTelegramUserID(ctx context.Context, in *UpdateTelegramUserIDRequest, opts ...grpc.CallOption) (*UpdateTelegramUserIDResponse, error) {
+	out := new(UpdateTelegramUserIDResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateTelegramUserID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddEventData(ctx context.Context, in *AddEventDataRequest, opts ...grpc.CallOption) (*AddEventDataResponse, error) {
+	out := new(AddEventDataResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/AddEventData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetAllEvents(ctx context.Context, in *GetAllEventsRequest, opts ...grpc.CallOption) (*GetAllEventsResponse, error) {
+	out := new(GetAllEventsResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetAllEvents", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) FinishEvent(ctx context.Context, in *FinishEventRequest, opts ...grpc.CallOption) (*FinishEventResponse, error) {
+	out := new(FinishEventResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/FinishEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UpdateUserSettings(ctx context.Context, in *UpdateUserSettingsRequest, opts ...grpc.CallOption) (*UpdateUserSettingsResponse, error) {
+	out := new(UpdateUserSettingsResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserSettings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserSettings(ctx context.Context, in *UserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error) {
+	out := new(UserSettingsResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserSettings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetFinances(ctx context.Context, in *GetFinancesRequest, opts ...grpc.CallOption) (*GetFinancesResponse, error) {
+	out := new(GetFinancesResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetFinances", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetCategories(ctx context.Context, in *GetCategoriesRequest, opts ...grpc.CallOption) (*GetCategoriesResponse, error) {
+	out := new(GetCategoriesResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetCategories", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddFinance(ctx context.Context, in *AddFinanceRequest, opts ...grpc.CallOption) (*AddFinanceResponse, error) {
+	out := new(AddFinanceResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/AddFinance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteFinance(ctx context.Context, in *DeleteFinanceRequest, opts ...grpc.CallOption) (*DeleteFinanceResponse, error) {
+	out := new(DeleteFinanceResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/DeleteFinance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddCategory(ctx context.Context, in *AddCategoryRequest, opts ...grpc.CallOption) (*AddCategoryResponse, error) {
+	out := new(AddCategoryResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/AddCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) ArchiveEvent(ctx context.Context, in *ArchiveEventRequest, opts ...grpc.CallOption) (*ArchiveEventResponse, error) {
+	out := new(ArchiveEventResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/ArchiveEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -124,6 +244,18 @@ type UserServiceServer interface {
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	UpdateTelegramUserID(context.Context, *UpdateTelegramUserIDRequest) (*UpdateTelegramUserIDResponse, error)
+	AddEventData(context.Context, *AddEventDataRequest) (*AddEventDataResponse, error)
+	GetAllEvents(context.Context, *GetAllEventsRequest) (*GetAllEventsResponse, error)
+	FinishEvent(context.Context, *FinishEventRequest) (*FinishEventResponse, error)
+	UpdateUserSettings(context.Context, *UpdateUserSettingsRequest) (*UpdateUserSettingsResponse, error)
+	GetUserSettings(context.Context, *UserSettingsRequest) (*UserSettingsResponse, error)
+	GetFinances(context.Context, *GetFinancesRequest) (*GetFinancesResponse, error)
+	GetCategories(context.Context, *GetCategoriesRequest) (*GetCategoriesResponse, error)
+	AddFinance(context.Context, *AddFinanceRequest) (*AddFinanceResponse, error)
+	DeleteFinance(context.Context, *DeleteFinanceRequest) (*DeleteFinanceResponse, error)
+	AddCategory(context.Context, *AddCategoryRequest) (*AddCategoryResponse, error)
+	ArchiveEvent(context.Context, *ArchiveEventRequest) (*ArchiveEventResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -154,6 +286,42 @@ func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest
 }
 func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateTelegramUserID(context.Context, *UpdateTelegramUserIDRequest) (*UpdateTelegramUserIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTelegramUserID not implemented")
+}
+func (UnimplementedUserServiceServer) AddEventData(context.Context, *AddEventDataRequest) (*AddEventDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddEventData not implemented")
+}
+func (UnimplementedUserServiceServer) GetAllEvents(context.Context, *GetAllEventsRequest) (*GetAllEventsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllEvents not implemented")
+}
+func (UnimplementedUserServiceServer) FinishEvent(context.Context, *FinishEventRequest) (*FinishEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinishEvent not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUserSettings(context.Context, *UpdateUserSettingsRequest) (*UpdateUserSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSettings not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserSettings(context.Context, *UserSettingsRequest) (*UserSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSettings not implemented")
+}
+func (UnimplementedUserServiceServer) GetFinances(context.Context, *GetFinancesRequest) (*GetFinancesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFinances not implemented")
+}
+func (UnimplementedUserServiceServer) GetCategories(context.Context, *GetCategoriesRequest) (*GetCategoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategories not implemented")
+}
+func (UnimplementedUserServiceServer) AddFinance(context.Context, *AddFinanceRequest) (*AddFinanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFinance not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteFinance(context.Context, *DeleteFinanceRequest) (*DeleteFinanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFinance not implemented")
+}
+func (UnimplementedUserServiceServer) AddCategory(context.Context, *AddCategoryRequest) (*AddCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCategory not implemented")
+}
+func (UnimplementedUserServiceServer) ArchiveEvent(context.Context, *ArchiveEventRequest) (*ArchiveEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ArchiveEvent not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -312,6 +480,222 @@ func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateTelegramUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTelegramUserIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateTelegramUserID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateTelegramUserID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateTelegramUserID(ctx, req.(*UpdateTelegramUserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddEventData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddEventDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddEventData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/AddEventData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddEventData(ctx, req.(*AddEventDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetAllEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetAllEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetAllEvents",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetAllEvents(ctx, req.(*GetAllEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_FinishEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FinishEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).FinishEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/FinishEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).FinishEvent(ctx, req.(*FinishEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UpdateUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateUserSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUserSettings(ctx, req.(*UpdateUserSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetUserSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserSettings(ctx, req.(*UserSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetFinances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFinancesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetFinances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetFinances",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetFinances(ctx, req.(*GetFinancesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCategoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetCategories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetCategories",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetCategories(ctx, req.(*GetCategoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddFinance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFinanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddFinance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/AddFinance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddFinance(ctx, req.(*AddFinanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteFinance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFinanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteFinance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/DeleteFinance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteFinance(ctx, req.(*DeleteFinanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/AddCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddCategory(ctx, req.(*AddCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_ArchiveEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ArchiveEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ArchiveEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/ArchiveEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ArchiveEvent(ctx, req.(*ArchiveEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +734,54 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _UserService_Login_Handler,
+		},
+		{
+			MethodName: "UpdateTelegramUserID",
+			Handler:    _UserService_UpdateTelegramUserID_Handler,
+		},
+		{
+			MethodName: "AddEventData",
+			Handler:    _UserService_AddEventData_Handler,
+		},
+		{
+			MethodName: "GetAllEvents",
+			Handler:    _UserService_GetAllEvents_Handler,
+		},
+		{
+			MethodName: "FinishEvent",
+			Handler:    _UserService_FinishEvent_Handler,
+		},
+		{
+			MethodName: "UpdateUserSettings",
+			Handler:    _UserService_UpdateUserSettings_Handler,
+		},
+		{
+			MethodName: "GetUserSettings",
+			Handler:    _UserService_GetUserSettings_Handler,
+		},
+		{
+			MethodName: "GetFinances",
+			Handler:    _UserService_GetFinances_Handler,
+		},
+		{
+			MethodName: "GetCategories",
+			Handler:    _UserService_GetCategories_Handler,
+		},
+		{
+			MethodName: "AddFinance",
+			Handler:    _UserService_AddFinance_Handler,
+		},
+		{
+			MethodName: "DeleteFinance",
+			Handler:    _UserService_DeleteFinance_Handler,
+		},
+		{
+			MethodName: "AddCategory",
+			Handler:    _UserService_AddCategory_Handler,
+		},
+		{
+			MethodName: "ArchiveEvent",
+			Handler:    _UserService_ArchiveEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

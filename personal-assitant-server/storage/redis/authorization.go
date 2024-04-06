@@ -2,9 +2,12 @@ package redis
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/redis/go-redis/v9"
 	"log"
 	"personal-assitant-project/config"
+	"strconv"
 )
 
 var redisClient *redis.Client
@@ -17,13 +20,35 @@ func init() {
 	})
 }
 
-func SaveRedisData(data interface{}, ctx context.Context, token string) error {
-	err := redisClient.Set(ctx, token, data, 0).Err()
+func SaveRedisData(userID int, token string, ctx context.Context) error {
+	// Use HSET to store the mapping between userID and token
+	err := redisClient.HSet(ctx, "user_tokens", token, userID).Err()
 	if err != nil {
-		log.Printf("Error saving session token to Redis: %v", err)
+		log.Printf("Error saving userID-token mapping to Redis: %v", err)
 		return err
 	}
 	return nil
+}
+func GetUserIDByToken(token string, ctx context.Context) (int, error) {
+	userIDStr, err := redisClient.HGet(ctx, "user_tokens", token).Result()
+	if err != nil {
+		if errors.Is(redis.Nil, err) {
+			//TODO можно сделать логи, где будет видно пользователя, который делает запрос к боту
+			log.Printf("Token not found in Redis: %s", token)
+			return 0, fmt.Errorf("Token not found")
+		}
+		// Handle other errors
+		log.Printf("Error retrieving userID from Redis: %v", err)
+		return 0, err
+	}
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		log.Printf("Error converting userID to integer: %v", err)
+		return 0, err
+	}
+
+	return userID, nil
 }
 
 //func generateSessionToken() string {

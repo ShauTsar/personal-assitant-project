@@ -19,6 +19,18 @@ service UserService {
   rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
+  rpc UpdateTelegramUserID(UpdateTelegramUserIDRequest) returns (UpdateTelegramUserIDResponse);
+  rpc AddEventData(AddEventDataRequest) returns (AddEventDataResponse);
+  rpc GetAllEvents(GetAllEventsRequest) returns (GetAllEventsResponse);
+  rpc FinishEvent(FinishEventRequest) returns (FinishEventResponse);
+  rpc UpdateUserSettings(UpdateUserSettingsRequest) returns (UpdateUserSettingsResponse);
+  rpc GetUserSettings(UserSettingsRequest) returns (UserSettingsResponse);
+  rpc GetFinances(GetFinancesRequest) returns (GetFinancesResponse);
+  rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+  rpc AddFinance(AddFinanceRequest) returns (AddFinanceResponse);
+  rpc DeleteFinance(DeleteFinanceRequest) returns (DeleteFinanceResponse);
+  rpc AddCategory(AddCategoryRequest) returns (AddCategoryResponse);
+  rpc ArchiveEvent(ArchiveEventRequest) returns (ArchiveEventResponse);
 }
 
 message ResetPasswordRequest {
@@ -91,6 +103,17 @@ message LoginResponse {
   string message = 3;
 }
 
+// Добавляем сообщения для обновления Telegram UserID
+message UpdateTelegramUserIDRequest {
+  string token = 1;
+  int32 userTelegramID = 2;
+}
+
+message UpdateTelegramUserIDResponse {
+  bool success = 1;
+  string message = 2;
+}
+
 message RegisterRequest {
   string username = 1;
   string password = 2;
@@ -102,3 +125,124 @@ message RegisterRequest {
 message RegisterResponse {
   bool success = 1;
 }
+message EventDataMessage {
+  string token = 1;
+  int32 task_id = 2;
+  int32 user_id = 3;
+  string start_date = 4;
+  string planned_date = 5;
+  string finished_date = 6;
+  string description = 7;
+  bool is_finished = 8;
+  bytes attachment = 9;
+  string title = 10;
+}
+
+message AddEventDataRequest {
+  EventDataMessage event_data = 1;
+}
+
+message AddEventDataResponse {
+  bool success = 1;
+  string message = 2;
+
+}
+message GetAllEventsRequest {
+  string token = 1;
+}
+
+message GetAllEventsResponse {
+  repeated EventDataMessage events = 1;
+}
+message FinishEventRequest {
+  int32 taskID = 1;
+  bool finish = 2;
+}
+
+message FinishEventResponse {
+  bool success = 1;
+  string message = 2;
+}
+//Не забудь, что сервак должен путь в байтовский массив закинуть
+message UserSettings {
+  string token = 1;
+  string timezone = 2;
+  bytes avatar_url = 3;
+  int32 notify_morning_hours = 5;
+  int32 notify_before_event_hours = 7;
+  int32 notify_every_evening_hours = 9;
+}
+message UpdateUserSettingsRequest {
+  UserSettings settings = 1;
+}
+message UserSettingsRequest {
+  string token = 1;
+}
+message UserSettingsResponse {
+  UserSettings settings = 1;
+}
+
+message UpdateUserSettingsResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message Finances {
+  string token = 1;
+  string date = 2;
+  string description =3;
+  string price =4;
+  Category category = 5;
+  bool is_expense =6;
+  int32 finance_id =7;
+}
+message Category{
+  int32 id =1;
+  string name = 2;
+  bool is_for_all =3;
+}
+message GetCategoriesRequest{
+  string token =1;
+}
+message GetCategoriesResponse{
+  repeated Category category = 1;
+}
+message GetFinancesRequest{
+  string token =1;
+}
+message GetFinancesResponse{
+  repeated Finances finances = 1;
+}
+message AddFinanceRequest{
+  Finances finances = 1;
+}
+message AddFinanceResponse{
+  bool success = 1;
+  string message = 2;
+}
+message DeleteFinanceRequest{
+  int32 finance_id = 1;
+}
+message DeleteFinanceResponse{
+  bool success = 1;
+  string message = 2;
+}
+message AddCategoryRequest {
+  string token = 1;
+  Category category = 2;
+}
+message AddCategoryResponse {
+  bool success = 1;
+  string message = 2;
+}
+message ArchiveEventRequest {
+  int32 task_id = 1;
+}
+message ArchiveEventResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+
+
+
