@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      restartPolicy: OnFailure # или "Never" в зависимости от ваших требований
       containers:
         - name: postgres-init
           image: postgres:13
