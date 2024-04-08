@@ -29,7 +29,6 @@ func init() {
 
 // TODO добавить в конце дня похвалу, вы молодец! вы выполнили столько-то планов
 var (
-	// Universal markup builders.
 	menu                   = &tb.ReplyMarkup{ResizeKeyboard: true, OneTimeKeyboard: true}
 	selector               = &tb.ReplyMarkup{}
 	tasks                  = &tb.ReplyMarkup{}
@@ -69,7 +68,6 @@ func main() {
 	b.Handle("/start", func(c tb.Context) error {
 		return c.Send("Здравствуйте, я рад приветствовать вас.😏", menu)
 	})
-
 	b.Handle(&btnHelp, func(c tb.Context) error {
 		return c.Send("В работе😏", selector)
 	})

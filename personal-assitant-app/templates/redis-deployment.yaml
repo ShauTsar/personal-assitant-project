@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-assitant-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personal-assitant-redis
+  template:
+    metadata:
+      labels:
+        app: personal-assitant-redis
+    spec:
+      containers:
+        - name: personal-assitant-redis
+          image: personal-assitant-redis:latest
+          ports:
+            - containerPort: 16379

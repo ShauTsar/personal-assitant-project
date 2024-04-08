@@ -3,16 +3,24 @@ package elastic
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
-	"github.com/elastic/go-elasticsearch"
+	"github.com/elastic/go-elasticsearch/v8"
 	"log"
+	"net/http"
 	"time"
 )
 
-func logToElasticsearch(logMessage string) {
+func LogToElasticsearch(logMessage string) {
 	cfg := elasticsearch.Config{
 		Addresses: []string{
-			"http://elasticsearch:9200",
+			"https://10.150.0.53:9200",
+		},
+		//Username: "novikov",
+		//Password: "NNA2s*123",
+		APIKey: "ajdKMXZJNEJzbk5NN21MeVlwVUI6dEZuM0hrS0VUdktIRWtlN1B4Nkt0dw==",
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // Пропустить проверку сертификата (не рекомендуется в продакшене)
 		},
 	}
 
@@ -30,12 +38,10 @@ func logToElasticsearch(logMessage string) {
 	if err != nil {
 		log.Fatalf("Error marshaling log entry: %s", err)
 	}
-
 	res, err := es.Index(
 		"logs",
 		bytes.NewReader(body),
 		es.Index.WithContext(context.Background()),
-		es.Index.WithDocumentType("log"),
 		es.Index.WithRefresh("true"),
 	)
 

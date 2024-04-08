@@ -17,7 +17,7 @@ func GenerateJWTToken(username string) (string, error) {
 	// Создание токена с настройками и подпись
 	claims := jwt.StandardClaims{
 		Subject:   username,
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Например, токен действителен 24 часа
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

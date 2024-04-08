@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-assitant-elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personal-assitant-elasticsearch
+  template:
+    metadata:
+      labels:
+        app: personal-assitant-elasticsearch
+    spec:
+      containers:
+        - name: personal-assitant-elasticsearch
+          image: personal-assitant-elasticsearch:latest
+          ports:
+            - containerPort: 9200

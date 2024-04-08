@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-assitant-botapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: personal-assitant-botapi
+  template:
+    metadata:
+      labels:
+        app: personal-assitant-botapi
+    spec:
+      containers:
+        - name: personal-assitant-botapi
+          image: personal-assitant-botapi:latest
+          ports:
+            - containerPort: 8080

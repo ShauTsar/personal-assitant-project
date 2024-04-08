@@ -7,6 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"log"
 	"personal-assitant-project/config"
+	"personal-assitant-project/personal-assitant-server/storage/elastic"
 	"strconv"
 )
 
@@ -21,7 +22,6 @@ func init() {
 }
 
 func SaveRedisData(userID int, token string, ctx context.Context) error {
-	// Use HSET to store the mapping between userID and token
 	err := redisClient.HSet(ctx, "user_tokens", token, userID).Err()
 	if err != nil {
 		log.Printf("Error saving userID-token mapping to Redis: %v", err)
@@ -34,10 +34,11 @@ func GetUserIDByToken(token string, ctx context.Context) (int, error) {
 	if err != nil {
 		if errors.Is(redis.Nil, err) {
 			//TODO можно сделать логи, где будет видно пользователя, который делает запрос к боту
+			elastic.LogToElasticsearch(fmt.Sprintf("Token not found in Redis: %s", token))
 			log.Printf("Token not found in Redis: %s", token)
 			return 0, fmt.Errorf("Token not found")
 		}
-		// Handle other errors
+		elastic.LogToElasticsearch(fmt.Sprintf("Error retrieving userID from Redis: %v", err))
 		log.Printf("Error retrieving userID from Redis: %v", err)
 		return 0, err
 	}

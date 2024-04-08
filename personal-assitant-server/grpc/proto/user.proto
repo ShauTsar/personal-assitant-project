@@ -91,7 +91,7 @@ message LogoutResponse {
   string message = 2;
 }
 
-// Добавляем новые сообщения для входа в систему
+
 message LoginRequest {
   string username = 1;
   string password = 2;
@@ -103,7 +103,7 @@ message LoginResponse {
   string message = 3;
 }
 
-// Добавляем сообщения для обновления Telegram UserID
+
 message UpdateTelegramUserIDRequest {
   string token = 1;
   int32 userTelegramID = 2;
@@ -163,7 +163,7 @@ message FinishEventResponse {
   bool success = 1;
   string message = 2;
 }
-//Не забудь, что сервак должен путь в байтовский массив закинуть
+
 message UserSettings {
   string token = 1;
   string timezone = 2;

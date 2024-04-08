@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"personal-assitant-project/personal-assitant-server/auth"
 	gen "personal-assitant-project/personal-assitant-server/grpc/proto/gen"
+	"personal-assitant-project/personal-assitant-server/storage/elastic"
 	"personal-assitant-project/personal-assitant-server/storage/postgre"
 	"personal-assitant-project/personal-assitant-server/storage/redis"
 	"time"
@@ -23,7 +24,7 @@ type UserServiceServer struct {
 func (s *UserServiceServer) Register(ctx context.Context, request *gen.RegisterRequest) (*gen.RegisterResponse, error) {
 	userExists, err := postgre.CheckUserExists(request.Username)
 	if err != nil {
-		log.Printf("Error checking user: %v", err)
+		elastic.LogToElasticsearch(fmt.Sprintf("Error checking user: %v", err))
 		return nil, err
 	}
 
@@ -36,20 +37,24 @@ func (s *UserServiceServer) Register(ctx context.Context, request *gen.RegisterR
 	// Сохраните данные пользователя в PostgreSQL
 	err = postgre.SaveUserData(request)
 	if err != nil {
-		log.Printf("Error saving user data: %v", err)
+		elastic.LogToElasticsearch(fmt.Sprintf("Error saving user data: %v", err))
+		//log.Printf("Error saving user data: %v", err)
 		return nil, err
 	}
 	//_________________________
 	token, err := auth.GenerateJWTToken(request.Username)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error generating token: %v", err))
 		return nil, err
 	}
 	usernameId, err := postgre.GetUserID(request.Username)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error get user ID: %v", err))
 		return nil, err
 	}
 	err = redis.SaveRedisData(usernameId, token, ctx)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error saving user cache: %v", err))
 		log.Printf("Error saving user cache: %v", err)
 	}
 	//______________________________________
@@ -62,6 +67,7 @@ func (s *UserServiceServer) Login(ctx context.Context, request *gen.LoginRequest
 	var message string
 	success, err := postgre.CheckCredentials(request.Username, request.Password)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error check credentials: %v", err))
 		return nil, errors.New("Db error")
 	}
 	if !success {
@@ -71,10 +77,12 @@ func (s *UserServiceServer) Login(ctx context.Context, request *gen.LoginRequest
 
 	token, err := auth.GenerateJWTToken(request.Username)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error GenerateJWTToken: %v", err))
 		return nil, err
 	}
 	usernameId, err := postgre.GetUserID(request.Username)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Eror GetUserID: %v", err))
 		return nil, err
 	}
 	err = redis.SaveRedisData(usernameId, token, ctx)
@@ -84,27 +92,31 @@ func (s *UserServiceServer) Login(ctx context.Context, request *gen.LoginRequest
 func (s *UserServiceServer) UpdateTelegramUserID(ctx context.Context, request *gen.UpdateTelegramUserIDRequest) (*gen.UpdateTelegramUserIDResponse, error) {
 	userID, err := redis.GetUserIDByToken(request.Token, ctx)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error getting userID from Redis: %v", err))
 		log.Printf("Error getting userID from Redis: %v", err)
 		return &gen.UpdateTelegramUserIDResponse{Success: false, Message: "Unknown error"}, err
 	}
 
 	success, err := postgre.UpdateTelegramUser(int(request.UserTelegramID), userID)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error updating Telegram user ID: %v", err))
 		log.Printf("Error updating Telegram user ID: %v", err)
 		return &gen.UpdateTelegramUserIDResponse{Success: false, Message: "Unknown error"}, err
 	}
-
+	elastic.LogToElasticsearch(fmt.Sprintf("Success: UserID %d, TelegramUserID %d", userID, request.UserTelegramID))
 	log.Printf("Success: UserID %d, TelegramUserID %d", userID, request.UserTelegramID)
 	return &gen.UpdateTelegramUserIDResponse{Success: success, Message: "Registration success"}, nil
 }
 func (s *UserServiceServer) AddEventData(ctx context.Context, request *gen.AddEventDataRequest) (*gen.AddEventDataResponse, error) {
 	userID, err := redis.GetUserIDByToken(request.EventData.Token, ctx)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error getting userID from Redis: %v", err))
 		log.Printf("Error getting userID from Redis: %v", err)
 		return &gen.AddEventDataResponse{Success: false, Message: "Unknown error"}, err
 	}
 	startDate, err := timeParsing(request.EventData.StartDate)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error parsing start date %v", err))
 		log.Printf("Error parsing start date %v", err)
 		return &gen.AddEventDataResponse{Success: false, Message: "Unknown error"}, err
 	}
@@ -112,17 +124,20 @@ func (s *UserServiceServer) AddEventData(ctx context.Context, request *gen.AddEv
 	if request.EventData.IsFinished {
 		finishedDate, err = timeParsing(request.EventData.FinishedDate)
 		if err != nil {
+			elastic.LogToElasticsearch(fmt.Sprintf("Error parsing finished date %v", err))
 			log.Printf("Error parsing finished date %v", err)
 			return &gen.AddEventDataResponse{Success: false, Message: "Unknown error"}, err
 		}
 	}
 	plannedDate, err := timeParsing(request.EventData.PlannedDate)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error parsing planned date %v", err))
 		log.Printf("Error parsing planned date %v", err)
 		return &gen.AddEventDataResponse{Success: false, Message: "Unknown error"}, err
 	}
 	err = postgre.AddTask(userID, startDate, plannedDate, finishedDate, request.EventData.Description, request.EventData.IsFinished, request.EventData.Attachment, request.EventData.Title)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error parsing planned date %v", err))
 		log.Printf("Error parsing planned date %v", err)
 		return &gen.AddEventDataResponse{Success: false, Message: "Unknown error"}, err
 	}
@@ -132,6 +147,7 @@ func timeParsing(date string) (time.Time, error) {
 	layout := time.RFC3339
 	formatDate, err := time.Parse(layout, date)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error parsing date %v", err))
 		log.Printf("Error parsing date %v", err)
 		return time.Now(), err
 	}
@@ -140,6 +156,7 @@ func timeParsing(date string) (time.Time, error) {
 func (s *UserServiceServer) GetAllEvents(ctx context.Context, request *gen.GetAllEventsRequest) (*gen.GetAllEventsResponse, error) {
 	userID, err := redis.GetUserIDByToken(request.Token, ctx)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error getting userID from Redis: %v", err))
 		log.Printf("Error getting userID from Redis: %v", err)
 		return &gen.GetAllEventsResponse{}, err
 	}
@@ -151,6 +168,7 @@ func (s *UserServiceServer) FinishEvent(ctx context.Context, request *gen.Finish
 
 	err := postgre.FinishTask(int(request.TaskID), request.Finish)
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error updating task: %v", err))
 		log.Printf("Error updating task: %v", err)
 		return &gen.FinishEventResponse{Success: false, Message: "Unknown error"}, err
 	}
