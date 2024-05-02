@@ -1,0 +1,6 @@
+FROM alpine:3.17 as final
+COPY --from=backend /app/grpc-main /app/grpc-main
+COPY --from=backend /app/botapi-main /app/botapi-main
+COPY --from=frontend /app/build /app/personal-assistant-web
+ENTRYPOINT ["/app/grpc-main"]
+CMD ["/app/botapi-main"]

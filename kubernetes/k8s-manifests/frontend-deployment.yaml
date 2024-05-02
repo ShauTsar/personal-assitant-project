@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-assitant-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personal-assitant-frontend
+  template:
+    metadata:
+      labels:
+        app: personal-assitant-frontend
+    spec:
+      containers:
+        - name: personal-assitant-frontend
+          image: shwme1nilrepeat/personal-assistant-frontend:latest
+          env:
+            - name: REACT_APP_GRPC_HOST
+              value: "http://grpc-service:50051"
+
+          ports:
+            - containerPort: 80

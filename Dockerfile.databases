@@ -1,0 +1,11 @@
+# Postgres
+FROM postgres:16.2-alpine
+ENV POSTGRES_DB=novaDB
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=NNA2s*123
+
+# Redis
+FROM redis:7.2.4-alpine
+
+# Elasticsearch
+FROM elasticsearch:8.13.0

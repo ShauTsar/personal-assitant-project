@@ -51,6 +51,13 @@ CREATE TABLE users_notification_settings
     for_task int,
     is_dark_them boolean
 );
+CREATE TABLE finances_categories
+(
+    id serial PRIMARY KEY,
+    name varchar(255),
+    is_for_all_users boolean default false,
+    user_id INT REFERENCES users(id)
+);
 CREATE TABLE finances
 (
     id serial PRIMARY KEY,
@@ -62,13 +69,7 @@ CREATE TABLE finances
     user_id INT REFERENCES users(id)
 
 );
-CREATE TABLE finances_categories
-(
-    id serial PRIMARY KEY,
-    name varchar(255),
-    is_for_all_users boolean default false,
-    user_id INT REFERENCES users(id)
-);
+
 
 INSERT INTO finances_categories (name, is_for_all_users) VALUES
     ('Подписки',true),

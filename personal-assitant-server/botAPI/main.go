@@ -10,8 +10,10 @@ import (
 	"log"
 	"personal-assitant-project/config"
 	botConfig "personal-assitant-project/personal-assitant-server/botAPI/config"
+	"personal-assitant-project/personal-assitant-server/storage/elastic"
 	"personal-assitant-project/personal-assitant-server/storage/postgre"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,25 +31,25 @@ func init() {
 
 // TODO добавить в конце дня похвалу, вы молодец! вы выполнили столько-то планов
 var (
-	menu                   = &tb.ReplyMarkup{ResizeKeyboard: true, OneTimeKeyboard: true}
+	menu                   = &tb.ReplyMarkup{}
 	selector               = &tb.ReplyMarkup{}
 	tasks                  = &tb.ReplyMarkup{}
-	btnHelp                = menu.Text("ℹ Help")
-	btnSettings            = menu.Text("⚙ Settings")
-	btnBusinessForToday    = menu.Text("Дела на сегодня:")
-	btnNonFinishedBusiness = menu.Text("Незавершенные дела на сегодня:")
-	btnBusinessForTomorrow = menu.Text("Дела на завтра:")
+	btnHelp                = menu.Data("ℹ Help", "help")
+	btnSettings            = menu.Data("⚙ Settings", "settings")
+	btnBusinessForToday    = menu.Data("Дела на сегодня", "today")
+	btnNonFinishedBusiness = menu.Data("Незавершенные дела на сегодня", "unfinished_today")
+	btnBusinessForTomorrow = menu.Data("Дела на завтра", "tomorrow")
+	btnAddNewTask          = menu.Data("Добавить новое событие", "addTask", "")
 	btnPrev                = selector.Data("⬅", "prev", "")
 	btnFinishTask          = tasks.Data("Завершить событие", "finish")
 	btnUnFinishTask        = tasks.Data("Вернуть событие", "unFinish", "")
 )
 
 func main() {
-	menu.Reply(
-		menu.Row(btnHelp),
-		menu.Row(btnSettings),
-		menu.Row(btnBusinessForToday, btnNonFinishedBusiness),
-		menu.Row(btnBusinessForTomorrow),
+	menu.Inline(
+		menu.Row(btnHelp, btnSettings),
+		menu.Row(btnBusinessForToday, btnBusinessForTomorrow),
+		menu.Row(btnNonFinishedBusiness),
 	)
 	selector.Inline(
 		selector.Row(btnPrev),
@@ -71,6 +73,9 @@ func main() {
 	b.Handle(&btnHelp, func(c tb.Context) error {
 		return c.Send("В работе😏", selector)
 	})
+	b.Handle(&btnSettings, func(c tb.Context) error {
+		return c.Send("В работе😏", selector)
+	})
 	b.Handle(&btnBusinessForToday, getBusinessForTodayFromDB)
 	b.Handle(&btnNonFinishedBusiness, getBusinessNotFinishedForTodayFromDB)
 	b.Handle(&btnBusinessForTomorrow, getBusinessForTomorrowFromDB)
@@ -87,12 +92,14 @@ func main() {
 func sendNotifyEveryMoring(b *tb.Bot) {
 	allUsers, err := postgre.GetAllTGUsersID()
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error getting all users:", err))
 		log.Println("Error getting all users:", err)
 		return
 	}
 	for _, user := range allUsers {
 		settings, err := postgre.GetUserSettings(user.UserID)
 		if err != nil {
+			elastic.LogToElasticsearch(fmt.Sprintf("Error getting settings:", err))
 			log.Println("Error getting settings:", err)
 			return
 		}
@@ -108,12 +115,14 @@ func sendNotifyEveryMoring(b *tb.Bot) {
 func sendEveryEveningForUsers(b *tb.Bot) {
 	allUsers, err := postgre.GetAllTGUsersID()
 	if err != nil {
+		elastic.LogToElasticsearch(fmt.Sprintf("Error getting all users:", err))
 		log.Println("Error getting all users:", err)
 		return
 	}
 	for _, user := range allUsers {
 		settings, err := postgre.GetUserSettings(user.UserID)
 		if err != nil {
+			elastic.LogToElasticsearch(fmt.Sprintf("Error getting settings:", err))
 			log.Println("Error getting settings:", err)
 			return
 		}
@@ -125,6 +134,7 @@ func sendEveryEveningForUsers(b *tb.Bot) {
 		time.Sleep(targetTime.Sub(now))
 		allUsers, err = postgre.GetAllTGUsersID()
 		if err != nil {
+			elastic.LogToElasticsearch(fmt.Sprintf("Error getting all users:", err))
 			log.Println("Error getting all users:", err)
 			return
 		}
@@ -139,6 +149,7 @@ func sendEventReminders(b *tb.Bot) {
 		now := time.Now()
 		allUsers, err := postgre.GetAllTGUsersID()
 		if err != nil {
+			elastic.LogToElasticsearch(fmt.Sprintf("Error getting all users:", err))
 			log.Println("Error getting all users:", err)
 			continue
 		}
@@ -146,11 +157,13 @@ func sendEventReminders(b *tb.Bot) {
 		for _, user := range allUsers {
 			settings, err := postgre.GetUserSettings(user.UserID)
 			if err != nil {
+				elastic.LogToElasticsearch(fmt.Sprintf("Error getting settings:", err))
 				log.Println("Error getting settings:", err)
 				return
 			}
 			events, err := postgre.FindTasksByUser(user.UserID)
 			if err != nil {
+				elastic.LogToElasticsearch(fmt.Sprintf("Error getting events for user:", err))
 				log.Println("Error getting events for user:", err)
 				continue
 			}
@@ -434,6 +447,43 @@ func sendEveningTaskListToAllUsers(b *tb.Bot, user postgre.AllTBotUsers) {
 		log.Printf("Error getting morning task list for user %d: %v\n", user.UserID, err)
 	}
 	messageText := "Добрый вечер и так дела, которые вы успешно завершили за сегодня:"
-	sendEventsToAllUsers(filteredEvents, user.TGUserID, true, b, messageText)
+	sendEveningEventsToAllUsers(filteredEvents, user.TGUserID, true, b, messageText)
 
+}
+func sendEveningEventsToAllUsers(filteredEvents []postgre.EventData, tgUserID int64, includeFinished bool, b *tb.Bot, messageText string) error {
+	if len(filteredEvents) == 0 {
+		return nil
+	}
+	var result []string
+	for _, event := range filteredEvents {
+		if event.FinishedDate.Format("02.01.2006") == time.Now().Format("02.01.2006") {
+			formattedTime := event.PlannedDate.Format("02.01.2006 15:04")
+			formattedStartDate := event.StartDate.Format("02.01.2006 15:04")
+			attachment := ""
+			if string(event.Attachment) != "" {
+				attachment = "Attachment: " + string(event.Attachment)
+			}
+			statusEmoji := "❗️"
+			if event.IsFinished {
+				statusEmoji = "✅"
+				message := fmt.Sprintf(
+					messageText+
+						"Заголовок: %s %s\n"+
+						"Описание: %s\n"+
+						"Планируемое время: %s\n"+
+						"Дата добавления: %s\n"+
+						"%s", event.Title, statusEmoji, event.Description, formattedTime, formattedStartDate, attachment)
+				result = append(result, message)
+			}
+		} else {
+			continue
+		}
+
+	}
+	resultMessage := strings.Join(result, "\n")
+	_, err := b.Send(&tb.User{ID: tgUserID}, "За сегодня вы выполнили: "+strconv.Itoa(len(result))+resultMessage)
+	if err != nil {
+		log.Printf("Error sending evening message to user %d: %v\n", tgUserID, err)
+	}
+	return nil
 }

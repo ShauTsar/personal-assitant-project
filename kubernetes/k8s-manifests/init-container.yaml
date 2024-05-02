@@ -1,0 +1,18 @@
+initContainers:
+  - name: init-generate-key
+    image: appropriate/image
+    command:
+      - /bin/sh
+      - -c
+      - |
+        KEY=$(openssl rand -base64 32)
+        kubectl create secret generic elasticsearch-credentials --from-literal=apiKey="$KEY"
+
+containers:
+  - name: personal-assitant-elasticsearch
+    image: shwme1nilrepeat/personal-assistant-elasticsearch:latest
+    envFrom:
+      - secretRef:
+          name: elasticsearch-credentials
+    ports:
+      - containerPort: 9200

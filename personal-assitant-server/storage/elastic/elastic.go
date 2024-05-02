@@ -8,17 +8,26 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 func LogToElasticsearch(logMessage string) {
+	esHost := os.Getenv("ELASTICSEARCH_HOST")
+	if esHost == "" {
+		esHost = "https://10.150.0.53:9200" // Значение по умолчанию для имени Kubernetes Service
+	}
+
+	apiKey := os.Getenv("ELASTICSEARCH_API_KEY")
+	if apiKey == "" {
+		apiKey = "ajdKMXZJNEJzbk5NN21MeVlwVUI6dEZuM0hrS0VUdktIRWtlN1B4Nkt0dw=="
+	}
+
 	cfg := elasticsearch.Config{
 		Addresses: []string{
-			"https://10.150.0.53:9200",
+			esHost,
 		},
-		//Username: "novikov",
-		//Password: "NNA2s*123",
-		APIKey: "ajdKMXZJNEJzbk5NN21MeVlwVUI6dEZuM0hrS0VUdktIRWtlN1B4Nkt0dw==",
+		APIKey: apiKey,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // Пропустить проверку сертификата (не рекомендуется в продакшене)
 		},

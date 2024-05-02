@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-assistant-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personal-assistant-postgres
+  template:
+    metadata:
+      labels:
+        app: personal-assistant-postgres
+    spec:
+      containers:
+        - name: personal-assistant-postgres
+          image: postgres:16.2
+          env:
+            - name: POSTGRES_DB
+              value: novaDB
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: NNA2s*123
+          volumeMounts:
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          ports:
+            - containerPort: 5432
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data-claim
+        - name: init-scripts
+          configMap:
+            name: init-scripts

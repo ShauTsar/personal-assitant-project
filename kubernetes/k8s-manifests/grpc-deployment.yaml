@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: personal-assitant-grpc
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: personal-assitant-grpc
@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: personal-assitant-grpc
-          image: personal-assitant-grpc:latest
+          image: shwme1nilrepeat/personal-assistant-backend:latest
+          args: [ "./grpc-main" ] # Запуск gRPC сервиса
           ports:
-            - containerPort: 50051
+            - containerPort: 50051 # Пример порта для gRPC сервиса
 ---

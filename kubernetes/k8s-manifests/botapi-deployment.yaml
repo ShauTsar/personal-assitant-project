@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: personal-assitant-botapi
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: personal-assitant-botapi
@@ -14,6 +14,14 @@ spec:
     spec:
       containers:
         - name: personal-assitant-botapi
-          image: personal-assitant-botapi:latest
+          image: shwme1nilrepeat/personal-assistant-botapi:latest
+          env:
+            - name: ELASTICSEARCH_HOST
+              value: "https://elasticsearch-service:9200"
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: POSTGRES_HOST
+              value: "postgres-service"
+          args: [ "./botapi-main" ] # Запуск BotAPI сервиса
           ports:
-            - containerPort: 8080
+            - containerPort: 8080 # Пример порта для BotAPI сервиса

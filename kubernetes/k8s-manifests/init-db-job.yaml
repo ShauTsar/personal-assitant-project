@@ -5,26 +5,38 @@ metadata:
 spec:
   template:
     spec:
+      restartPolicy: OnFailure
       containers:
         - name: init-db
-          image: personal-assistant-postgres:latest
-          command: ["/bin/sh", "-c", "psql -h postgres -U postgres -d novaDB -f /sql/init.sql"]
+          image: postgres:16.2 # Используйте нужную версию PostgreSQL
+          command:
+            - psql
+            - "-h"
+            - "postgres-service"  # Имя службы PostgreSQL
+            - "-p"
+            - "5432"  # Порт службы PostgreSQL
+            - "-U"
+            - "postgres"  # Имя пользователя PostgreSQL
+            - "-d"
+            - "novaDB"  # Имя базы данных
+          env:
+            - name: PGPASSWORD
+              value: NNA2s*123  # Пароль пользователя PostgreSQL
           volumeMounts:
-            - name: sql-scripts
-              mountPath: /sql
-      restartPolicy: OnFailure
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
       volumes:
-        - name: sql-scripts
+        - name: init-scripts
           configMap:
-            name: db-init-scripts
+            name: init-scripts
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: db-init-scripts
+  name: init-scripts
 data:
   init.sql: |
-    CREATE TABLE users (
+    CREATE TABLE IF NOT EXISTS users (
       id         SERIAL PRIMARY KEY,
       username   VARCHAR(255) NOT NULL,
       password   VARCHAR(255) NOT NULL,
@@ -34,7 +46,7 @@ data:
       phone      VARCHAR(255)
     );
     
-    CREATE TABLE tasks (
+    CREATE TABLE IF NOT EXISTS tasks (
       id            SERIAL PRIMARY KEY,
       user_id       INT REFERENCES users(id),
       start_date    TIMESTAMP,
@@ -44,7 +56,7 @@ data:
       is_finished   BOOLEAN DEFAULT false
     );
     
-    CREATE TABLE tbot (
+    CREATE TABLE IF NOT EXISTS tbot (
       id                  SERIAL PRIMARY KEY,
       user_id             INT REFERENCES users(id),
       tg_user_id          INT,
@@ -56,10 +68,10 @@ data:
     );
     
     --TODO не забыть использовать это в коде
-    ALTER TABLE tasks ADD COLUMN attachment VARCHAR(255);
-    ALTER TABLE tasks ADD COLUMN title VARCHAR(255);
+    ALTER TABLE IF EXISTS tasks ADD COLUMN IF NOT EXISTS attachment VARCHAR(255);
+    ALTER TABLE IF EXISTS tasks ADD COLUMN IF NOT EXISTS title VARCHAR(255);
     
-    CREATE TABLE users_notification_settings (
+    CREATE TABLE IF NOT EXISTS users_notification_settings (
       id           SERIAL PRIMARY KEY,
       user_id      INT REFERENCES users(id),
       for_morning  INT,
@@ -67,8 +79,14 @@ data:
       for_task     INT,
       is_dark_theme BOOLEAN
     );
+    CREATE TABLE IF NOT EXISTS finances_categories (
+      id               SERIAL PRIMARY KEY,
+      name             VARCHAR(255),
+      is_for_all_users BOOLEAN DEFAULT false,
+      user_id          INT REFERENCES users(id)
+    );
     
-    CREATE TABLE finances (
+    CREATE TABLE IF NOT EXISTS finances (
       id           SERIAL PRIMARY KEY,
       category_id  INT REFERENCES finances_categories(id),
       fin_date     DATE,
@@ -78,12 +96,7 @@ data:
       user_id      INT REFERENCES users(id)
     );
     
-    CREATE TABLE finances_categories (
-      id               SERIAL PRIMARY KEY,
-      name             VARCHAR(255),
-      is_for_all_users BOOLEAN DEFAULT false,
-      user_id          INT REFERENCES users(id)
-    );
+    
     
     INSERT INTO finances_categories (name, is_for_all_users) VALUES
     ('Подписки', true),
@@ -97,11 +110,12 @@ data:
     ('Одежда', true),
     ('Обувь', true),
     ('Путешествия', true);
+  
+  
+    ALTER TABLE IF EXISTS finances ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
+    ALTER TABLE IF EXISTS finances_categories ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
     
-    ALTER TABLE finances ADD COLUMN user_id INT REFERENCES users(id);
-    ALTER TABLE finances_categories ADD COLUMN user_id INT REFERENCES users(id);
-    
-    CREATE TABLE archived_tasks (
+    CREATE TABLE IF NOT EXISTS archived_tasks (
       id            SERIAL PRIMARY KEY,
       user_id       INT REFERENCES users(id),
       start_date    TIMESTAMP,
@@ -112,6 +126,6 @@ data:
       archived_date TIMESTAMP
     );
     
-    ALTER TABLE archived_tasks ADD COLUMN attachment VARCHAR(255);
-    ALTER TABLE archived_tasks ADD COLUMN title VARCHAR(255);
+    ALTER TABLE IF EXISTS archived_tasks ADD COLUMN IF NOT EXISTS attachment VARCHAR(255);
+    ALTER TABLE IF EXISTS archived_tasks ADD COLUMN IF NOT EXISTS title VARCHAR(255);
     -- и другие таблицы
