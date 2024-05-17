@@ -1,0 +1,131 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: personal-assistant-init-db
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-db
+          image: postgres:16.2 # Используйте нужную версию PostgreSQL
+          command:
+            - psql
+            - "-h"
+            - "postgres-service"  # Имя службы PostgreSQL
+            - "-p"
+            - "5432"  # Порт службы PostgreSQL
+            - "-U"
+            - "postgres"  # Имя пользователя PostgreSQL
+            - "-d"
+            - "novaDB"  # Имя базы данных
+          env:
+            - name: PGPASSWORD
+              value: NNA2s*123  # Пароль пользователя PostgreSQL
+          volumeMounts:
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: init-scripts
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-scripts
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS users (
+      id         SERIAL PRIMARY KEY,
+      username   VARCHAR(255) NOT NULL,
+      password   VARCHAR(255) NOT NULL,
+      email      VARCHAR(255) NOT NULL,
+      timezone   VARCHAR(255), --NOT NULL,
+      avatar_url VARCHAR(255),
+      phone      VARCHAR(255)
+    );
+    
+    CREATE TABLE IF NOT EXISTS tasks (
+      id            SERIAL PRIMARY KEY,
+      user_id       INT REFERENCES users(id),
+      start_date    TIMESTAMP,
+      planned_date  TIMESTAMP,
+      finished_date TIMESTAMP,
+      description   VARCHAR(550),
+      is_finished   BOOLEAN DEFAULT false
+    );
+    
+    CREATE TABLE IF NOT EXISTS tbot (
+      id                  SERIAL PRIMARY KEY,
+      user_id             INT REFERENCES users(id),
+      tg_user_id          INT,
+      task_id             INT REFERENCES tasks(id),
+      notification_enabled BOOLEAN DEFAULT true,
+      notification_time   TIME,
+      last_notified_at    TIMESTAMP,
+      CONSTRAINT tg_user_unique UNIQUE (tg_user_id)
+    );
+    
+    --TODO не забыть использовать это в коде
+    ALTER TABLE IF EXISTS tasks ADD COLUMN IF NOT EXISTS attachment VARCHAR(255);
+    ALTER TABLE IF EXISTS tasks ADD COLUMN IF NOT EXISTS title VARCHAR(255);
+    
+    CREATE TABLE IF NOT EXISTS users_notification_settings (
+      id           SERIAL PRIMARY KEY,
+      user_id      INT REFERENCES users(id),
+      for_morning  INT,
+      for_evening  INT,
+      for_task     INT,
+      is_dark_theme BOOLEAN
+    );
+    CREATE TABLE IF NOT EXISTS finances_categories (
+      id               SERIAL PRIMARY KEY,
+      name             VARCHAR(255),
+      is_for_all_users BOOLEAN DEFAULT false,
+      user_id          INT REFERENCES users(id)
+    );
+    
+    CREATE TABLE IF NOT EXISTS finances (
+      id           SERIAL PRIMARY KEY,
+      category_id  INT REFERENCES finances_categories(id),
+      fin_date     DATE,
+      description  VARCHAR(550),
+      price        VARCHAR(250),
+      is_expense   BOOLEAN DEFAULT true,
+      user_id      INT REFERENCES users(id)
+    );
+    
+    
+    
+    INSERT INTO finances_categories (name, is_for_all_users) VALUES
+    ('Подписки', true),
+    ('Фитнес', true),
+    ('Продукты', true),
+    ('Рестораны', true),
+    ('Транспорт', true),
+    ('Автомобиль', true),
+    ('Подарки', true),
+    ('Развлечения', true),
+    ('Одежда', true),
+    ('Обувь', true),
+    ('Путешествия', true);
+  
+  
+    ALTER TABLE IF EXISTS finances ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
+    ALTER TABLE IF EXISTS finances_categories ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
+    
+    CREATE TABLE IF NOT EXISTS archived_tasks (
+      id            SERIAL PRIMARY KEY,
+      user_id       INT REFERENCES users(id),
+      start_date    TIMESTAMP,
+      planned_date  TIMESTAMP,
+      finished_date TIMESTAMP,
+      description   VARCHAR(550),
+      is_finished   BOOLEAN DEFAULT false,
+      archived_date TIMESTAMP
+    );
+    
+    ALTER TABLE IF EXISTS archived_tasks ADD COLUMN IF NOT EXISTS attachment VARCHAR(255);
+    ALTER TABLE IF EXISTS archived_tasks ADD COLUMN IF NOT EXISTS title VARCHAR(255);
+    -- и другие таблицы
