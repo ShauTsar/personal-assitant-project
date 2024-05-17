@@ -39,7 +39,8 @@ services:
       - postgres
       - redis
       - elasticsearch
-
+    networks:
+      personal-assistant-grpc:
   frontend:
     image: shwme1nilrepeat/personal-assistant-frontend:latest
     environment:
