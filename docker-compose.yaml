@@ -43,20 +43,20 @@ services:
   frontend:
     image: shwme1nilrepeat/personal-assistant-frontend:latest
     environment:
-      - REACT_APP_GRPC_HOST=http://localhost:8080
+      - REACT_APP_GRPC_HOST=http://backend:50051
     ports:
       - "8081:80"  # Изменение внешнего порта на 8081
     depends_on:
       - backend
-  gateway-envoy:
-    image: shwme1nilrepeat/personal-assistant-envoy:latest
-    ports:
-      - "8080:8080"
-    networks:
-      - personal-assistant-grpc
-
-networks:
-  personal-assistant-grpc:
+#  gateway-envoy:
+#    image: shwme1nilrepeat/personal-assistant-envoy:latest
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - personal-assistant-grpc
+#
+#networks:
+#  personal-assistant-grpc:
 
 volumes:
   postgres-data:
