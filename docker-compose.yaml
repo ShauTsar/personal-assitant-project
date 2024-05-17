@@ -34,13 +34,12 @@ services:
       - REDIS_HOST=redis
     ports:
       - "50051:50051"
-      - "8080:8080"
+#      - "8080:8080"
     depends_on:
       - postgres
       - redis
       - elasticsearch
-    networks:
-      personal-assistant-grpc:
+
   frontend:
     image: shwme1nilrepeat/personal-assistant-frontend:latest
     environment:
@@ -54,7 +53,10 @@ services:
     ports:
       - "8080:8080"
     networks:
-      personal-assistant-grpc:
+      - personal-assistant-grpc
+
+networks:
+  personal-assistant-grpc:
 
 volumes:
   postgres-data:
