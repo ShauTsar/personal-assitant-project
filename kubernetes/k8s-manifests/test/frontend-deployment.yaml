@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: personal-assitant-frontend
+  name: personal-assistant-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: personal-assitant-frontend
+      app: personal-assistant-frontend
   template:
     metadata:
       labels:
-        app: personal-assitant-frontend
+        app: personal-assistant-frontend
     spec:
       containers:
-        - name: personal-assitant-frontend
+        - name: personal-assistant-frontend
           image: shwme1nilrepeat/personal-assistant-frontend:latest
           env:
             - name: REACT_APP_GRPC_HOST
