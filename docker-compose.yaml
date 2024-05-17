@@ -48,6 +48,12 @@ services:
       - "8081:80"  # Изменение внешнего порта на 8081
     depends_on:
       - backend
+  gateway-envoy:
+    image: shwme1nilrepeat/personal-assistant-envoy:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - personal-assistant-grpc
 
 volumes:
   postgres-data:
